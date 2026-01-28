@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Question For You</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ffb6c1 0%, #ff69b4 50%, #ff1493 100%);
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .message {
+            font-size: 28px;
+            color: #d63384;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .celebration-message {
+            font-size: 48px;
+            color: #d63384;
+            margin-bottom: 20px;
+            font-weight: bold;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .image-container {
+            margin: 20px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 15px;
+            object-fit: contain;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+            font-weight: bold;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-yes:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-no:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            animation: fall linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% {
+                opacity: 1;
+                transform: translateY(-100px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+
+    <div class="container">
+        <!-- Initial State -->
+        <div id="question-section">
+            <div class="message">Will you be my Valentine?</div>
+            <div class="image-container">
+                <!-- Cute bear holding heart image -->
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWJmN2d0MzZvNnBqaXJkcWRkYWNrZnU3Z2U5dXFqNHRwYndtN3dxaCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lp0D8EezWMXBhcQwBo/giphy.gif" alt="Cute Valentine" id="cute-image">
+            </div>
+            <div class="buttons">
+                <button class="btn btn-yes" id="yes-btn" onclick="sayYes()">Yes</button>
+                <button class="btn btn-no" id="no-btn" onclick="sayNo()">No</button>
+            </div>
+        </div>
+
+        <!-- Celebration State -->
+        <div id="celebration-section" class="hidden">
+            <div class="celebration-message">Yay!</div>
+            <div class="image-container">
+                <!-- Fireworks GIF -->
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGJxdXh0dGU3OHNlZXI2cTk2dGd0aWwweTNycHBwY2c1eWNxdHlhYyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26tOZ42Mg6pbTUPHW/giphy.gif" alt="Fireworks Celebration">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let noClickCount = 0;
+        let yesScale = 1;
+
+        function sayYes() {
+            document.getElementById('question-section').classList.add('hidden');
+            document.getElementById('celebration-section').classList.remove('hidden');
+            createHearts();
+        }
+
+        function sayNo() {
+            const noBtn = document.getElementById('no-btn');
+            const yesBtn = document.getElementById('yes-btn');
+
+            noClickCount++;
+
+            // Change text to "Last Chance" after first click
+            noBtn.textContent = 'Last Chance';
+
+            // Grow the Yes button each time
+            yesScale += 0.3;
+            yesBtn.style.transform = `scale(${yesScale})`;
+            yesBtn.style.zIndex = noClickCount;
+
+            // Make the No button smaller each time
+            const noScale = Math.max(0.5, 1 - (noClickCount * 0.1));
+            noBtn.style.transform = `scale(${noScale})`;
+
+            // After several clicks, Yes button becomes impossible to avoid
+            if (noClickCount >= 5) {
+                yesBtn.style.padding = '30px 80px';
+                yesBtn.style.fontSize = '32px';
+            }
+        }
+
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartSymbols = ['❤️', '💕', '💖', '💗', '💓', '💘', '💝'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    heartsContainer.appendChild(heart);
+
+                    setTimeout(() => heart.remove(), 5000);
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
